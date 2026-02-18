@@ -39,7 +39,7 @@ BSBF_RESOURCES="https://raw.githubusercontent.com/bondingshouldbefree/bsbf-resou
 
 # Install bash, ethtool, fping, jq, and usb-modeswitch.
 apt update
-apt install bash ethtool fping jq usb-modeswitch
+apt install -y bash ethtool fping jq usb-modeswitch
 
 # Install xray and its configuration.
 curl -fsSL https://github.com/XTLS/Xray-install/raw/main/install-release.sh | bash
