@@ -57,26 +57,29 @@ curl $BSBF_RESOURCES/resources-client/bsbf_bonding.nft -o /etc/nftables/bsbf_bon
 curl $BSBF_RESOURCES/resources-client/99-bsbf-bonding.conf -o /etc/systemd/system/xray@.service.d/99-bsbf-bonding.conf
 
 # Install bsbf-mptcp.
-curl $BSBF_RESOURCES/bsbf-mptcp/files/usr/sbin/bsbf-mptcp -o /usr/sbin/bsbf-mptcp
-chmod +x /usr/sbin/bsbf-mptcp
-curl $BSBF_RESOURCES/bsbf-mptcp/files/usr/sbin/bsbf-mptcp-helper -o /usr/sbin/bsbf-mptcp-helper
-chmod +x /usr/sbin/bsbf-mptcp-helper
+mkdir -p /usr/local/sbin
+curl $BSBF_RESOURCES/resources-client/bsbf-mptcp -o /usr/local/sbin/bsbf-mptcp
+chmod +x /usr/local/sbin/bsbf-mptcp
+curl $BSBF_RESOURCES/resources-client/bsbf-mptcp-helper -o /usr/local/sbin/bsbf-mptcp-helper
+chmod +x /usr/local/sbin/bsbf-mptcp-helper
 curl $BSBF_RESOURCES/resources-client/bsbf-mptcp.service -o /usr/lib/systemd/system/bsbf-mptcp.service
 
 # Install bsbf-route.
-curl $BSBF_RESOURCES/bsbf-route/files/usr/sbin/bsbf-route -o /usr/sbin/bsbf-route
-chmod +x /usr/sbin/bsbf-route
+curl $BSBF_RESOURCES/resources-client/bsbf-route -o /usr/local/sbin/bsbf-route
+chmod +x /usr/local/sbin/bsbf-route
 curl $BSBF_RESOURCES/resources-client/bsbf-route.service -o /usr/lib/systemd/system/bsbf-route.service
 
+# Install tcp-in-udp.
+mkdir -p /usr/lib/bpf
+curl $BSBF_RESOURCES/resources-client/tcp_in_udp_tc_le.o -o /usr/lib/bpf/tcp_in_udp_tc.o
+
 # Install bsbf-tcp-in-udp.
-mkdir -p /usr/local/share/tcp-in-udp
-curl $BSBF_RESOURCES/bsbf-tcp-in-udp/files/usr/local/share/tcp-in-udp/tcp_in_udp_tc_le.o -o /usr/local/share/tcp-in-udp/tcp_in_udp_tc.o
-curl -s $BSBF_RESOURCES/bsbf-tcp-in-udp/files/usr/sbin/bsbf-tcp-in-udp \
+curl -s $BSBF_RESOURCES/resources-client/bsbf-tcp-in-udp \
   | sed -e "s/^BASE_PORT=.*/BASE_PORT=$server_port/" \
 	-e "s/^IPv4=.*/IPv4=\"$server_ipv4\"/" \
-  > /usr/sbin/bsbf-tcp-in-udp
+  > /usr/local/sbin/bsbf-tcp-in-udp
 
-chmod +x /usr/sbin/bsbf-tcp-in-udp
+chmod +x /usr/local/sbin/bsbf-tcp-in-udp
 curl $BSBF_RESOURCES/resources-client/99-bsbf-tcp-in-udp.sh -o /etc/NetworkManager/dispatcher.d/99-bsbf-tcp-in-udp.sh
 chmod +x /etc/NetworkManager/dispatcher.d/99-bsbf-tcp-in-udp.sh
 
