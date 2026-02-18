@@ -52,6 +52,9 @@ curl -s $BSBF_RESOURCES/resources-client/xray.json \
       | .outbounds[0].settings.id = $UUID' \
   > /usr/local/etc/xray/bsbf-bonding.json
 
+systemctl disable --quiet xray
+systemctl stop xray
+
 mkdir -p /etc/nftables
 curl $BSBF_RESOURCES/resources-client/bsbf_bonding.nft -o /etc/nftables/bsbf_bonding.nft
 curl $BSBF_RESOURCES/resources-client/99-bsbf-bonding.conf -o /etc/systemd/system/xray@.service.d/99-bsbf-bonding.conf
