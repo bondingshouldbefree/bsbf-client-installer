@@ -38,11 +38,11 @@ done
 BSBF_RESOURCES="https://raw.githubusercontent.com/bondingshouldbefree/bsbf-resources/refs/heads/main"
 
 # Install bash, ethtool, fping, jq, and usb-modeswitch.
-sudo apt update
-sudo apt install bash ethtool fping jq usb-modeswitch
+apt update
+apt install bash ethtool fping jq usb-modeswitch
 
 # Install xray and its configuration.
-curl -fsSL https://github.com/XTLS/Xray-install/raw/main/install-release.sh | sudo bash
+curl -fsSL https://github.com/XTLS/Xray-install/raw/main/install-release.sh | bash
 curl -s $BSBF_RESOURCES/resources-client/xray.json \
   | jq --arg SERVER "$server_ipv4" \
        --argjson PORT "$server_port" \
@@ -50,39 +50,39 @@ curl -s $BSBF_RESOURCES/resources-client/xray.json \
         .outbounds[0].settings.address = $SERVER
       | .outbounds[0].settings.port = $PORT
       | .outbounds[0].settings.id = $UUID' \
-  | sudo tee /usr/local/etc/xray/bsbf-bonding.json > /dev/null
+  > /usr/local/etc/xray/bsbf-bonding.json
 
-sudo mkdir /etc/nftables
-sudo curl $BSBF_RESOURCES/resources-client/bsbf_bonding.nft -o /etc/nftables/bsbf_bonding.nft
-sudo curl $BSBF_RESOURCES/resources-client/99-bsbf-bonding.conf -o /etc/systemd/system/xray@.service.d/99-bsbf-bonding.conf
+mkdir -p /etc/nftables
+curl $BSBF_RESOURCES/resources-client/bsbf_bonding.nft -o /etc/nftables/bsbf_bonding.nft
+curl $BSBF_RESOURCES/resources-client/99-bsbf-bonding.conf -o /etc/systemd/system/xray@.service.d/99-bsbf-bonding.conf
 
 # Install bsbf-mptcp.
-sudo curl $BSBF_RESOURCES/bsbf-mptcp/files/usr/sbin/bsbf-mptcp -o /usr/sbin/bsbf-mptcp
-sudo chmod +x /usr/sbin/bsbf-mptcp
-sudo curl $BSBF_RESOURCES/bsbf-mptcp/files/usr/sbin/bsbf-mptcp-helper -o /usr/sbin/bsbf-mptcp-helper
-sudo chmod +x /usr/sbin/bsbf-mptcp-helper
-sudo curl $BSBF_RESOURCES/resources-client/bsbf-mptcp.service -o /usr/lib/systemd/system/bsbf-mptcp.service
+curl $BSBF_RESOURCES/bsbf-mptcp/files/usr/sbin/bsbf-mptcp -o /usr/sbin/bsbf-mptcp
+chmod +x /usr/sbin/bsbf-mptcp
+curl $BSBF_RESOURCES/bsbf-mptcp/files/usr/sbin/bsbf-mptcp-helper -o /usr/sbin/bsbf-mptcp-helper
+chmod +x /usr/sbin/bsbf-mptcp-helper
+curl $BSBF_RESOURCES/resources-client/bsbf-mptcp.service -o /usr/lib/systemd/system/bsbf-mptcp.service
 
 # Install bsbf-route.
-sudo curl $BSBF_RESOURCES/bsbf-route/files/usr/sbin/bsbf-route -o /usr/sbin/bsbf-route
-sudo chmod +x /usr/sbin/bsbf-route
-sudo curl $BSBF_RESOURCES/resources-client/bsbf-route.service -o /usr/lib/systemd/system/bsbf-route.service
+curl $BSBF_RESOURCES/bsbf-route/files/usr/sbin/bsbf-route -o /usr/sbin/bsbf-route
+chmod +x /usr/sbin/bsbf-route
+curl $BSBF_RESOURCES/resources-client/bsbf-route.service -o /usr/lib/systemd/system/bsbf-route.service
 
 # Install bsbf-tcp-in-udp.
-sudo mkdir -p /usr/local/share/tcp-in-udp
-sudo curl $BSBF_RESOURCES/bsbf-tcp-in-udp/files/usr/local/share/tcp-in-udp/tcp_in_udp_tc_le.o -o /usr/local/share/tcp-in-udp/tcp_in_udp_tc.o
+mkdir -p /usr/local/share/tcp-in-udp
+curl $BSBF_RESOURCES/bsbf-tcp-in-udp/files/usr/local/share/tcp-in-udp/tcp_in_udp_tc_le.o -o /usr/local/share/tcp-in-udp/tcp_in_udp_tc.o
 curl -s $BSBF_RESOURCES/bsbf-tcp-in-udp/files/usr/sbin/bsbf-tcp-in-udp \
   | sed -e "s/^BASE_PORT=.*/BASE_PORT=$server_port/" \
 	-e "s/^IPv4=.*/IPv4=\"$server_ipv4\"/" \
-  | sudo tee /usr/sbin/bsbf-tcp-in-udp > /dev/null
+  > /usr/sbin/bsbf-tcp-in-udp
 
-sudo chmod +x /usr/sbin/bsbf-tcp-in-udp
-sudo curl $BSBF_RESOURCES/resources-client/99-bsbf-tcp-in-udp.sh -o /etc/NetworkManager/dispatcher.d/99-bsbf-tcp-in-udp.sh
-sudo chmod +x /etc/NetworkManager/dispatcher.d/99-bsbf-tcp-in-udp.sh
+chmod +x /usr/sbin/bsbf-tcp-in-udp
+curl $BSBF_RESOURCES/resources-client/99-bsbf-tcp-in-udp.sh -o /etc/NetworkManager/dispatcher.d/99-bsbf-tcp-in-udp.sh
+chmod +x /etc/NetworkManager/dispatcher.d/99-bsbf-tcp-in-udp.sh
 
 # Enable and (re)start systemd services.
-sudo systemctl enable bsbf-mptcp bsbf-route xray@bsbf-bonding
-sudo systemctl restart bsbf-mptcp bsbf-route xray@bsbf-bonding
+systemctl enable bsbf-mptcp bsbf-route xray@bsbf-bonding
+systemctl restart bsbf-mptcp bsbf-route xray@bsbf-bonding
 
 # Restart NetworkManager to apply the TCP-in-UDP dispatcher script.
-sudo systemctl restart NetworkManager
+systemctl restart NetworkManager
